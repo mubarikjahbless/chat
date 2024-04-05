@@ -1,5 +1,5 @@
 import { MiddlewareConsumer, Module, NestModule } from '@nestjs/common';
-import { AppController } from './app/app.controller';
+import { AppController } from './api/app.controller';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { MongooseModule } from '@nestjs/mongoose';
 import { WinstonModule } from 'nest-winston';
@@ -10,6 +10,7 @@ import { LoggerMiddleware } from './common/middleware/logger.middleware';
 import { JwtAuthGuard } from './common/guards/jwt-auth.guard';
 import { APP_GUARD } from '@nestjs/core';
 import { ApiResponseService } from './common/utility/api-response.service';
+import { SocketModule } from './socket/socket.module';
 
 @Module({
   imports: [
@@ -40,6 +41,7 @@ import { ApiResponseService } from './common/utility/api-response.service';
       }),
       inject: [ConfigService],
     }),
+    SocketModule,
   ],
   controllers: [AppController],
   providers: [

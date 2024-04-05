@@ -42,7 +42,7 @@ async function bootstrap() {
   app.use(helmet({ contentSecurityPolicy: false }));
   app.use(json({ limit: '100mb' }));
   app.use(urlencoded({ limit: '100mb', extended: true }));
-  app.setGlobalPrefix('/api/v1/user-mgt', { exclude: ['docs'] });
+  app.setGlobalPrefix('/api/v1/', { exclude: ['docs'] });
   const limiter = rateLimit({
     windowMs: 1 * 60 * 1000, // 1 min
     max: 20, // No of Requests
@@ -72,7 +72,7 @@ async function bootstrap() {
 
   await app.listen(configService.get<number>('port'), async () => {
     console.log(
-      `User Service Server Running on ${configService.get<number>('port')}`,
+      `User Service Server Running on http://localhost:${configService.get<number>('port')}`,
     );
   });
 }
