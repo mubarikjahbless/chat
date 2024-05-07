@@ -1,7 +1,6 @@
 import { MiddlewareConsumer, Module, NestModule } from '@nestjs/common';
 import { AppController } from './api/app.controller';
-import { ConfigModule, ConfigService } from '@nestjs/config';
-import { MongooseModule } from '@nestjs/mongoose';
+import { ConfigModule } from '@nestjs/config';
 import { WinstonModule } from 'nest-winston';
 import configuration from '../config/configuration';
 import * as path from 'path';
@@ -34,16 +33,11 @@ import { SocketModule } from './socket/socket.module';
       ],
     }),
     ConfigModule.forRoot({ isGlobal: true, load: [configuration] }),
-    MongooseModule.forRootAsync({
-      imports: [ConfigModule],
-      useFactory: (configService: ConfigService) => ({
-        uri: configService.get<string>('database.host'),
-      }),
-      inject: [ConfigService],
-    }),
     SocketModule,
   ],
-  controllers: [AppController],
+  controllers: [
+    AppController,
+  ],
   providers: [
     {
       provide: APP_GUARD,

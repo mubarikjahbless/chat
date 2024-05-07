@@ -10,18 +10,12 @@ const getJwtSignature = (): jwt.SignOptions => {
   };
 };
 
-export const createJwtToken = (
-  data: any,
-): { expireTime: number; value: string } => {
+export const createJwtToken = (data: any): { token: string } => {
   const jwtSignature = getJwtSignature();
 
   const value = jwt.sign(data, process.env.JWT_ACCESS_KEY, jwtSignature);
 
-  const decoded: any = decodeToken(value);
-
-  const expireTime: number = decoded.exp;
-
-  return { expireTime, value };
+  return { token: value };
 };
 
 export const verifyJwtToken = (token: string): string | jwt.JwtPayload => {
