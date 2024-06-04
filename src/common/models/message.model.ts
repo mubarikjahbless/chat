@@ -1,25 +1,33 @@
-import {User} from './user.model';
-import {Room} from './room.model';
+import {RoomModel} from './room.model';
 import {ObjectID} from 'bson';
 import {Prop, Schema, SchemaFactory} from "@nestjs/mongoose";
-import {Types} from "mongoose";
+import {Types, Schema as MongooseSchema} from "mongoose";
+import { BaseSchema } from './base.model';
 
+export type ContentType = 'text' | 'file' | 'emoji';
+export interface Content {
+  type: ContentType;
+  text?: string;
+  fileUrl?: string;
+  emoji?: string;
+}
 @Schema()
-export class Message {
+export class MessageModel extends BaseSchema {
 
-  _id: ObjectID | string;
-
-  @Prop({required: true})
-  text: string;
-
-  @Prop({required: true})
-  created: Date;
+  @Prop({required: true, type:MongooseSchema.Types.Mixed })
+  content: Content;
 
   @Prop({required: true, ref: 'User', type: Types.ObjectId})
-  owner: User | string | ObjectID;
+  from: Types.ObjectId;
+
+  @Prop({ ref: 'User', type: Types.ObjectId})
+  to: Types.ObjectId;
 
   @Prop({required: true, ref: 'Room', type: Types.ObjectId})
-  room: Room | string;
+  room: RoomModel;
+
+  @Prop()
+  status: string
 }
 
-export const MessageSchema = SchemaFactory.createForClass(Message)
+export const MessageSchema = SchemaFactory.createForClass(MessageModel)

@@ -1,21 +1,21 @@
-import {Message} from './message.model';
-import {User} from './user.model';
+import {MessageModel} from './message.model';
+import {UserModel} from './user.model';
 import {ObjectID} from 'bson';
 import {Prop, Schema, SchemaFactory} from "@nestjs/mongoose";
 import {Types} from "mongoose";
 
 @Schema()
-export class Room {
+export class RoomModel {
   _id: ObjectID | string;
 
-  @Prop({required: true, maxlength: 20, minlength: 5})
+  @Prop({required: true})
   name: string;
 
   @Prop({type: [{type: Types.ObjectId, ref: 'Message'}]})
-  messages: Message[];
+  messages: MessageModel[];
 
   @Prop({type: [{type: Types.ObjectId, ref: 'User'}]})
-  connectedUsers: User[];
+  connectedUsers: UserModel[];
 }
 
-export const RoomSchema = SchemaFactory.createForClass(Room)
+export const RoomSchema = SchemaFactory.createForClass(RoomModel)

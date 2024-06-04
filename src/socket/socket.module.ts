@@ -1,22 +1,26 @@
 import {MiddlewareConsumer, Module, NestModule } from '@nestjs/common';
 import { SocketService } from './services/socket.service';
 import { SocketGateway } from './gateway/socket.gateway';
-import { MessagesController } from 'src/api/messages/messages.controller';
-import { RoomsController } from '../api/rooms/rooms.controller';
+import { MessagesController } from '../api/messages/controllers/messages.controller';
+import { RoomsController } from '../api/rooms/controller/rooms.controller';
 import { AuthController } from 'src/api/auth/auth.controller';
-import { Message, MessageSchema, Room, RoomSchema, User, UserSchema } from 'src/common/models';
+import { MessageModel, MessageSchema, RoomModel, RoomSchema, UserModel, UserSchema } from 'src/common/models';
 import { MongooseModule } from '@nestjs/mongoose';
 import { environment } from 'src/environment';
 import { ClientsModule, Transport } from '@nestjs/microservices';
 import { SocketAuthMiddleware } from '../common/middleware';
+import { RoomService } from '../api/rooms/services/room.service';
+import { ApiResponseService } from 'src/common/utility/api-response.service';
+import { MessageService } from '../api/messages/service/messages.service';
+import { AuthService } from '../api/auth/auth.service';
 
 
 @Module({
   imports:[MongooseModule.forRoot(environment.MONGO_DB_URL || process.env.DB_URL, {}),
     MongooseModule.forFeature([
-      { name: Message.name, schema: MessageSchema },
-      { name: Room.name, schema: RoomSchema },
-      { name: User.name, schema: UserSchema },
+      { name: MessageModel.name, schema: MessageSchema },
+      { name: RoomModel.name, schema: RoomSchema },
+      { name: UserModel.name, schema: UserSchema },
     ]),
     ClientsModule.register([
       {
@@ -29,7 +33,7 @@ import { SocketAuthMiddleware } from '../common/middleware';
       },
     ])
   ],
-  providers: [SocketGateway, SocketService],
+  providers: [SocketGateway, SocketService, RoomService,MessageService, ApiResponseService,AuthService],
   controllers:[
     RoomsController,
     MessagesController,

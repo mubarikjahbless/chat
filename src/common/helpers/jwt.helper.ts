@@ -1,5 +1,6 @@
 import { ForbiddenException } from '@nestjs/common';
 import * as jwt from 'jsonwebtoken';
+import { User } from '../types/message';
 
 const getJwtSignature = (): jwt.SignOptions => {
   return {
@@ -10,10 +11,23 @@ const getJwtSignature = (): jwt.SignOptions => {
   };
 };
 
-export const createJwtToken = (data: any): { token: string } => {
+export const loginPayload = (user: User) => {
+  const { token } = createJwtToken(user);
+  const decoded: any = decodeToken(token);
+  const expireTime: number = decoded.exp;
+
+  return {
+    expireTime,
+    user: { id: user.id, name: user.name },
+    token,
+  };
+
+};
+
+export const createJwtToken = (user: User): { token: string } => {
   const jwtSignature = getJwtSignature();
 
-  const value = jwt.sign(data, process.env.JWT_ACCESS_KEY, jwtSignature);
+  const value = jwt.sign({ id: user.id, name: user.name }, process.env.JWT_ACCESS_KEY, jwtSignature);
 
   return { token: value };
 };

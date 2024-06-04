@@ -1,6 +1,6 @@
 export { BaseSchema } from './base.model'
-export { MessageSchema, Message } from './message.model'
-export { RoomSchema, Room } from './room.model'
-export { User, UserSchema } from './user.model'
+export { MessageSchema, MessageModel } from './message.model'
+export { RoomSchema, RoomModel } from './room.model'
+export { UserModel, UserSchema } from './user.model'
 
  

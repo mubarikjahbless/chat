@@ -8,7 +8,7 @@ import { StatusCode } from '../enums/status-code.enum';
 
 @Injectable()
 export class ApiResponseService {
-  successResponse(message: string) {
+  successResponse(message='successful') {
     return {
       status: StatusCode.SUCCESS,
       message,
@@ -43,10 +43,10 @@ export class ApiResponseService {
     });
   }
 
-  notFoundResponse(resource?: string) {
+  notFoundResponse(resource="Not found") {
     throw new NotFoundException({
       status: StatusCode.FAILURE,
-      message: resource ? `${resource} not found` : 'Not found',
+      message: resource,
     });
   }
 
@@ -75,10 +75,10 @@ export class ApiResponseService {
     });
   }
 
-  unauthorizedResponse() {
+  unauthorizedResponse(message='Unauthorized Access') {
     throw new ForbiddenException({
       statusCode: StatusCode.UNAUTHORIZED,
-      message: 'Unauthorized Access',
+      message,
     });
   }
 }

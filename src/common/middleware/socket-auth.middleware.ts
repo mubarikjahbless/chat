@@ -3,11 +3,11 @@ import { InjectModel } from '@nestjs/mongoose';
 import { expressjwt } from 'express-jwt';
 import { JwtPayload } from 'jsonwebtoken';
 import { Model } from 'mongoose';
-import { User } from '../models';
+import { UserModel } from '../models';
 
 @Injectable()
 export class SocketAuthMiddleware implements NestMiddleware {
-  constructor(@InjectModel(User.name) private readonly userModel: Model<User>) {}
+  constructor(@InjectModel(UserModel.name) private readonly userModel: Model<UserModel>) {}
 
   use(req, res, next) {
     expressjwt({ 
