@@ -8,7 +8,6 @@ import * as winston from 'winston';
 import { LoggerMiddleware } from './common/middleware/logger.middleware';
 import { JwtAuthGuard } from './common/guards/jwt-auth.guard';
 import { APP_GUARD } from '@nestjs/core';
-import { ApiResponseService } from './common/utility/api-response.service';
 import { SocketModule } from './socket/socket.module';
 
 @Module({
@@ -43,7 +42,6 @@ import { SocketModule } from './socket/socket.module';
       provide: APP_GUARD,
       useClass: JwtAuthGuard,
     },
-    ApiResponseService,
   ],
 })
 export class AppModule implements NestModule {

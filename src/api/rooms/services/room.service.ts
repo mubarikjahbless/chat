@@ -1,8 +1,8 @@
 import { Injectable } from "@nestjs/common";
 import { InjectModel } from "@nestjs/mongoose";
 import { Model } from "mongoose";
-import { RoomModel } from "src/common/models";
-import { ApiResponseService } from "src/common/utility/api-response.service";
+import { RoomModel } from "../../../common/models";
+import { ApiResponseService } from "../../../common/utility/api-response.service";
 import { ObjectId } from 'mongodb';
 import { CreateRoomDTO } from "../dto/create-room.dto";
 import { UpdateRoomDTO } from "../dto/update-room.dto";
@@ -15,8 +15,8 @@ export class RoomService {
     ) { }
 
 
-    public getRooms() {
-        const result = this.model.find();
+    public async getRooms() {
+        const result =  await this.model.find();
         return this.apiResponseService.successResponseWithData('all rooms', result)
     }
 

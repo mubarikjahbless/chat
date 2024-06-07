@@ -9,7 +9,7 @@ import {
   MaxLength,
   MinLength,
 } from 'class-validator';
-import { ChatRoomType } from 'src/common/enums/chat-room-type';
+import { ChatRoomType } from '../../../common/enums/chat-room-type';
 
 export class CreateRoomDTO {
   @IsString()

@@ -1,5 +1,5 @@
 import { InjectModel } from "@nestjs/mongoose";
-import { Model, Types } from "mongoose";
+import { Model } from "mongoose";
 import { MessageModel } from "../../../common/models";
 import { ApiResponseService } from "../../../common/utility/api-response.service";
 import { CreateMessageDTO } from "../dto/create-message.dto";
@@ -49,7 +49,6 @@ export class MessageService {
           }
      ])
      
-    //  .find(where).populate({path:'from'});
      return this.apiResponseService.successResponseWithData('success', result)
     }
 

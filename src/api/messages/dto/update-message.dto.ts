@@ -1,23 +1,26 @@
 import { IsNotEmpty, IsOptional, IsString } from "class-validator";
-import { ObjectId } from "mongoose";
+import { Types } from "mongoose";
+import { Content } from "../../../common/types/message";
 
 export class UpdateMessageDTO{
 
-    @IsNotEmpty()
-   _id: ObjectId
- 
-   @IsOptional()
-   @IsString()
-   @IsNotEmpty()
-   text: string;
+  @IsString()
+  @IsNotEmpty()
+  content: Content;
 
-   @IsOptional()
-   @IsNotEmpty()
-   @IsString()
-   owner?: ObjectId;
- 
-   @IsOptional()
-   @IsNotEmpty()
-   @IsString()
-   room?: ObjectId;
+  @IsOptional()
+  @IsString()
+  from: Types.ObjectId;
+
+  @IsOptional()
+  @IsString()
+  to: Types.ObjectId;
+
+  @IsOptional()
+  @IsString()
+  room?: Types.ObjectId;
+
+  @IsString()
+  status:string
+
  }

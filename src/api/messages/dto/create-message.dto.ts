@@ -1,6 +1,6 @@
 import { IsString, IsNotEmpty} from "class-validator";
-import { ObjectId, Types } from "mongoose";
-import { Content } from "src/common/types/message";
+import { Types } from "mongoose";
+import { Content } from "../../../common/types/message";
 
 
 export class CreateMessageDTO{

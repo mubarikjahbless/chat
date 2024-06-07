@@ -1,16 +1,12 @@
 import { Body, Controller, Delete, Get, Param, Post, Put, Query, ValidationPipe } from '@nestjs/common';
-import { RoomModel } from '../../../common/models';
-import { InjectModel } from '@nestjs/mongoose';
-import { Model } from 'mongoose';
 import { CreateRoomDTO } from '../dto/create-room.dto';
 import { RoomService } from '../services/room.service';
 import { UpdateRoomDTO } from '../dto/update-room.dto';
-import { Public } from 'src/common/decorators';
+import { Public } from '../../../common/decorators';
 
 @Controller('rooms')
 export class RoomsController {
   constructor(
-    @InjectModel(RoomModel.name) private readonly model: Model<RoomModel>,
     private readonly roomService: RoomService
   ) {} 
 
