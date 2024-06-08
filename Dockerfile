@@ -25,7 +25,7 @@ COPY --from=build /app/package*.json ./
 COPY --from=build /app/dist ./dist
 
 # Install production dependencies only
-RUN npm install --production
+RUN npm install --legacy-peer-deps --omit=dev
 
 # Expose the port that your NestJS application will run on
 EXPOSE 5001
