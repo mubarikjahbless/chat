@@ -14,16 +14,15 @@ import { ChatRoomType } from '../../../common/enums/chat-room-type';
 export class CreateRoomDTO {
   @IsString()
   @IsNotEmpty()
-  @MinLength(5, {message:'name too short minimum should be 5 charactors'})
-  @MaxLength(20,{message:'name too long maximum should be 20 charactors'})
+  @MinLength(5, { message: 'name too short minimum should be 5 charactors' })
+  @MaxLength(20, { message: 'name too long maximum should be 20 charactors' })
   name: string;
 
   @IsString()
   @IsOptional()
   type: string = ChatRoomType.PUBLIC;
 
-
-// TODO: remove these below properties as arrays 
+  // TODO: remove these below properties as arrays
   @IsOptional()
   @IsArray()
   @ArrayNotEmpty()
@@ -36,7 +35,4 @@ export class CreateRoomDTO {
   @IsString({ each: true })
   @IsOptional()
   members?: string[];
-
-
-
 }

@@ -24,7 +24,7 @@ export class JwtAuthGuard implements CanActivate {
 
     const request = context.switchToHttp().getRequest();
     const authorization = request.headers.authorization;
-        
+
     if (!authorization) {
       throw new UnauthorizedException('User un authenticated');
     }
@@ -37,8 +37,8 @@ export class JwtAuthGuard implements CanActivate {
 
     try {
       const token = split[1];
-     const  payload = verifyJwtToken(token);
-      context.switchToHttp().getRequest().user = payload;      
+      const payload = verifyJwtToken(token);
+      context.switchToHttp().getRequest().user = payload;
     } catch (error) {
       throw new UnauthorizedException('User un authenticated');
     }

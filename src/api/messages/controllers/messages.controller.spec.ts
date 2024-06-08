@@ -34,17 +34,21 @@ describe('MessagesController', () => {
 
       const result = await controller.getDirectChatMessages(query);
 
-      expect(mockMessageService.getDirectChatMessages).toHaveBeenCalledWith(query);
+      expect(mockMessageService.getDirectChatMessages).toHaveBeenCalledWith(
+        query,
+      );
       expect(result).toBe('result');
     });
   });
 
   describe('saveMessage', () => {
     it('should call MessageService saveMessage with CreateMessageDTO', async () => {
-      const message: CreateMessageDTO = { content: {
-        text: 'Hello',
-        type: 'private'
-      }} as CreateMessageDTO;
+      const message: CreateMessageDTO = {
+        content: {
+          text: 'Hello',
+          type: 'private',
+        },
+      } as CreateMessageDTO;
       mockMessageService.saveMessage.mockResolvedValue('saved-message');
 
       const result = await controller.createMessage(message);

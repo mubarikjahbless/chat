@@ -21,13 +21,16 @@ export const loginPayload = (user: User) => {
     user: { id: user.id, name: user.name },
     token,
   };
-
 };
 
 export const createJwtToken = (user: User): { token: string } => {
   const jwtSignature = getJwtSignature();
 
-  const value = jwt.sign({ id: user.id, name: user.name }, process.env.JWT_ACCESS_KEY, jwtSignature);
+  const value = jwt.sign(
+    { id: user.id, name: user.name },
+    process.env.JWT_ACCESS_KEY,
+    jwtSignature,
+  );
 
   return { token: value };
 };

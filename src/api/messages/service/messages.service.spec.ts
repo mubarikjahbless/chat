@@ -28,7 +28,10 @@ describe('MessageService', () => {
     const module: TestingModule = await Test.createTestingModule({
       providers: [
         MessageService,
-        { provide: getModelToken(MessageModel.name), useValue: mockMessageModel },
+        {
+          provide: getModelToken(MessageModel.name),
+          useValue: mockMessageModel,
+        },
         { provide: ApiResponseService, useValue: mockApiResponseService },
       ],
     }).compile();
@@ -44,12 +47,16 @@ describe('MessageService', () => {
   describe('getMessages', () => {
     it('should return messages based on the condition', async () => {
       const messages = [{ message: 'Message1' }, { message: 'Message2' }];
-      mockMessageModel.find.mockReturnValue({ populate: jest.fn().mockReturnValue(messages) });
+      mockMessageModel.find.mockReturnValue({
+        populate: jest.fn().mockReturnValue(messages),
+      });
 
-       await service.getMessages({});
+      await service.getMessages({});
 
       expect(mockMessageModel.find).toHaveBeenCalledWith({});
-      expect(mockApiResponseService.successResponseWithData).toHaveBeenCalledWith('successful', messages);
+      expect(
+        mockApiResponseService.successResponseWithData,
+      ).toHaveBeenCalledWith('successful', messages);
     });
   });
 
@@ -58,16 +65,39 @@ describe('MessageService', () => {
       const messages = [{ message: 'Message1' }];
       mockMessageModel.aggregate.mockResolvedValue(messages);
 
-     await service.getDirectChatMessages({ from: 'user1', to: 'user2' });
+      await service.getDirectChatMessages({ from: 'user1', to: 'user2' });
 
       expect(mockMessageModel.aggregate).toHaveBeenCalledWith([
         { $match: { from: 'user1', to: 'user2' } },
-        { $lookup: { from: 'User', localField: 'from', foreignField: '_id', as: 'fromUserDetails' } },
-        { $lookup: { from: 'User', localField: 'to', foreignField: '_id', as: 'toUserDetails' } },
-        { $project: { _id: 1, message: 1, content: 1, profileInfo: { $arrayElemAt: ['$fromUserDetails', 0] } } }
+        {
+          $lookup: {
+            from: 'User',
+            localField: 'from',
+            foreignField: '_id',
+            as: 'fromUserDetails',
+          },
+        },
+        {
+          $lookup: {
+            from: 'User',
+            localField: 'to',
+            foreignField: '_id',
+            as: 'toUserDetails',
+          },
+        },
+        {
+          $project: {
+            _id: 1,
+            message: 1,
+            content: 1,
+            profileInfo: { $arrayElemAt: ['$fromUserDetails', 0] },
+          },
+        },
       ]);
 
-      expect(mockApiResponseService.successResponseWithData).toHaveBeenCalledWith('success', messages);
+      expect(
+        mockApiResponseService.successResponseWithData,
+      ).toHaveBeenCalledWith('success', messages);
     });
   });
 
@@ -76,22 +106,26 @@ describe('MessageService', () => {
       const messages = [{ message: 'Message1' }, { message: 'Message2' }];
       mockMessageModel.find.mockResolvedValue(messages);
 
-     await service.getallMessages();
+      await service.getallMessages();
 
       expect(mockMessageModel.find).toHaveBeenCalled();
-      expect(mockApiResponseService.successResponseWithData).toHaveBeenCalledWith('success', messages);
+      expect(
+        mockApiResponseService.successResponseWithData,
+      ).toHaveBeenCalledWith('success', messages);
     });
   });
 
   describe('saveMessage', () => {
     it('should save a message and return it', async () => {
-      const message = { content:{ text:'hi'} } as  CreateMessageDTO;
+      const message = { content: { text: 'hi' } } as CreateMessageDTO;
       mockMessageModel.create.mockResolvedValue(message);
 
-     await service.saveMessage(message);
+      await service.saveMessage(message);
 
       expect(mockMessageModel.create).toHaveBeenCalledWith(message);
-      expect(mockApiResponseService.successResponseWithData).toHaveBeenCalledWith('successful', message);
+      expect(
+        mockApiResponseService.successResponseWithData,
+      ).toHaveBeenCalledWith('successful', message);
     });
   });
 
@@ -100,17 +134,21 @@ describe('MessageService', () => {
       const data = { id: 'some-id', message: 'Updated message' };
       mockMessageModel.findByIdAndUpdate.mockResolvedValue(data);
 
-       await service.updateMessage(data);
+      await service.updateMessage(data);
 
-      expect(mockMessageModel.findByIdAndUpdate).toHaveBeenCalledWith(data.id, { $set: { ...data } });
-      expect(mockApiResponseService.successResponse).toHaveBeenCalledWith('successful');
+      expect(mockMessageModel.findByIdAndUpdate).toHaveBeenCalledWith(data.id, {
+        $set: { ...data },
+      });
+      expect(mockApiResponseService.successResponse).toHaveBeenCalledWith(
+        'successful',
+      );
     });
 
     it('should return a not found response if message is not found', async () => {
       const data = { id: 'some-id', message: 'Updated message' };
       mockMessageModel.findByIdAndUpdate.mockResolvedValue(null);
 
-     await service.updateMessage(data);
+      await service.updateMessage(data);
 
       expect(mockApiResponseService.notFoundResponse).toHaveBeenCalled();
     });
@@ -120,10 +158,14 @@ describe('MessageService', () => {
     it('should delete a message and return a success response', async () => {
       mockMessageModel.findByIdAndDelete.mockResolvedValue(true);
 
-       await service.deleteMessage('some-id');
+      await service.deleteMessage('some-id');
 
-      expect(mockMessageModel.findByIdAndDelete).toHaveBeenCalledWith('some-id');
-      expect(mockApiResponseService.successResponse).toHaveBeenCalledWith('successfully deleted');
+      expect(mockMessageModel.findByIdAndDelete).toHaveBeenCalledWith(
+        'some-id',
+      );
+      expect(mockApiResponseService.successResponse).toHaveBeenCalledWith(
+        'successfully deleted',
+      );
     });
 
     it('should return a not found response if message is not found', async () => {

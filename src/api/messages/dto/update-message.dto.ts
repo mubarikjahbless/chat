@@ -1,9 +1,8 @@
-import { IsNotEmpty, IsOptional, IsString } from "class-validator";
-import { Types } from "mongoose";
-import { Content } from "../../../common/types/message";
+import { IsNotEmpty, IsOptional, IsString } from 'class-validator';
+import { Types } from 'mongoose';
+import { Content } from '../../../common/types/message';
 
-export class UpdateMessageDTO{
-
+export class UpdateMessageDTO {
   @IsString()
   @IsNotEmpty()
   content: Content;
@@ -21,6 +20,5 @@ export class UpdateMessageDTO{
   room?: Types.ObjectId;
 
   @IsString()
-  status:string
-
- }
+  status: string;
+}

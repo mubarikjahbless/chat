@@ -34,9 +34,7 @@ import { SocketModule } from './socket/socket.module';
     ConfigModule.forRoot({ isGlobal: true, load: [configuration] }),
     SocketModule,
   ],
-  controllers: [
-    AppController,
-  ],
+  controllers: [AppController],
   providers: [
     {
       provide: APP_GUARD,

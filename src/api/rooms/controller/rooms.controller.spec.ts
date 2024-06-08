@@ -38,7 +38,7 @@ describe('RoomsController', () => {
     it('should call RoomService searchRoom with query', async () => {
       const searchQuery = 'some-query';
       mockRoomService.searchRoom.mockResolvedValue('result');
-      
+
       const result = await controller.searchRoom(searchQuery);
 
       expect(mockRoomService.searchRoom).toHaveBeenCalledWith(searchQuery);

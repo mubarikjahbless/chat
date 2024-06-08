@@ -62,9 +62,7 @@ async function bootstrap() {
   app.use('/docs', async (req, res, next) => {
     return basicAuth({
       users: {
-        [`${configService.get<string>(
-          'docs.userName',
-        )}`]: `${configService.get<string>('docs.password')}`,
+        [`${configService.get<string>('docs.userName')}`]: `${configService.get<string>('docs.password')}`,
       },
       challenge: true,
     })(req, res, next);
