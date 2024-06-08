@@ -10,9 +10,7 @@ import {
 
 @Injectable()
 export class JwtAuthGuard implements CanActivate {
-  constructor(
-    private reflector: Reflector, // @InjectModel(Auth.name) private authModel: Model<Auth>,
-  ) {}
+  constructor(private reflector: Reflector) {}
 
   async canActivate(context: ExecutionContext) {
     const isPublic = this.reflector.getAllAndOverride<boolean>(IS_PUBLIC_KEY, [
@@ -27,33 +25,23 @@ export class JwtAuthGuard implements CanActivate {
     const request = context.switchToHttp().getRequest();
     const authorization = request.headers.authorization;
 
-    if (!authorization || !authorization.startsWith('Bearer ')) {
+    if (!authorization) {
       throw new UnauthorizedException('User un authenticated');
     }
 
-    const split = authorization && authorization.split(' '); //-> Authorization: Bearer vvv
+    const split = authorization.split(' ');
 
-    if (!split || split.length !== 2) {
+    if (split.length !== 2 || !split[1]) {
       throw new UnauthorizedException('User unauthenticated');
     }
-
-    const token = split[1];
-    if (!token) {
-      throw new UnauthorizedException('User unauthenticated');
-    }
-
-    let payload: any;
 
     try {
-      payload = await verifyJwtToken(token);
-      request.user = payload;
+      const token = split[1];
+      const payload = verifyJwtToken(token);
+      context.switchToHttp().getRequest().user = payload;
     } catch (error) {
       throw new UnauthorizedException('User un authenticated');
     }
-
-    // if (user.status === UserStatus.BANNED) {
-    //   throw new UnauthorizedException('You account is banned contact support');
-    // }
 
     return true;
   }

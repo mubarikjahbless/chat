@@ -1,7 +1,10 @@
-import { Injectable } from '@nestjs/common';
 import { Socket } from 'socket.io';
-
-@Injectable()
+import {
+  Ctx,
+  MessagePattern,
+  Payload,
+  RedisContext,
+} from '@nestjs/microservices';
 export class SocketService {
   private readonly connectedClients: Map<string, Socket> = new Map();
 
@@ -13,8 +16,13 @@ export class SocketService {
       this.connectedClients.delete(clientId);
     });
 
-    //TODO
-    // Handle events and messages from the client
+    // TODO
+    // Handle redis publish here
+  }
+
+  @MessagePattern('notifications')
+  getNotifications(@Payload() data: number[], @Ctx() context: RedisContext) {
+    // listen for notification messages and publish to the other instances
   }
 
   // Add more methods for handling events, messages, etc.

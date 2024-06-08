@@ -2,6 +2,8 @@
 /dist
 /build
 /node_modules
+/docker-compose-files
+/environments
 
 # Logs
 logs

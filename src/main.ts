@@ -11,6 +11,8 @@ import rateLimit from 'express-rate-limit';
 import { ValidationError, useContainer } from 'class-validator';
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
 import { ApiResponseService } from './common/utility/api-response.service';
+import { AuthAdapter } from './common/adapters/auth.adapter';
+
 async function bootstrap() {
   const app = await NestFactory.create(AppModule, { cors: true });
   const configService: ConfigService = app.get<ConfigService>(ConfigService);
@@ -60,14 +62,14 @@ async function bootstrap() {
   app.use('/docs', async (req, res, next) => {
     return basicAuth({
       users: {
-        [`${configService.get<string>(
-          'docs.userName',
-        )}`]: `${configService.get<string>('docs.password')}`,
+        [`${configService.get<string>('docs.userName')}`]: `${configService.get<string>('docs.password')}`,
       },
       challenge: true,
     })(req, res, next);
   });
   SwaggerModule.setup('docs', app, document);
+  app.useWebSocketAdapter(new AuthAdapter(app));
+
   useContainer(app.select(AppModule), { fallbackOnErrors: true });
 
   await app.listen(configService.get<number>('port'), async () => {

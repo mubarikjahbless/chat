@@ -1,7 +1,6 @@
 import { MiddlewareConsumer, Module, NestModule } from '@nestjs/common';
 import { AppController } from './api/app.controller';
-import { ConfigModule, ConfigService } from '@nestjs/config';
-import { MongooseModule } from '@nestjs/mongoose';
+import { ConfigModule } from '@nestjs/config';
 import { WinstonModule } from 'nest-winston';
 import configuration from '../config/configuration';
 import * as path from 'path';
@@ -9,7 +8,6 @@ import * as winston from 'winston';
 import { LoggerMiddleware } from './common/middleware/logger.middleware';
 import { JwtAuthGuard } from './common/guards/jwt-auth.guard';
 import { APP_GUARD } from '@nestjs/core';
-import { ApiResponseService } from './common/utility/api-response.service';
 import { SocketModule } from './socket/socket.module';
 
 @Module({
@@ -34,13 +32,6 @@ import { SocketModule } from './socket/socket.module';
       ],
     }),
     ConfigModule.forRoot({ isGlobal: true, load: [configuration] }),
-    MongooseModule.forRootAsync({
-      imports: [ConfigModule],
-      useFactory: (configService: ConfigService) => ({
-        uri: configService.get<string>('database.host'),
-      }),
-      inject: [ConfigService],
-    }),
     SocketModule,
   ],
   controllers: [AppController],
@@ -49,7 +40,6 @@ import { SocketModule } from './socket/socket.module';
       provide: APP_GUARD,
       useClass: JwtAuthGuard,
     },
-    ApiResponseService,
   ],
 })
 export class AppModule implements NestModule {

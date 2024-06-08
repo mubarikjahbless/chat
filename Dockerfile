@@ -7,7 +7,7 @@ WORKDIR /app
 COPY package*.json ./
 
 # Install all dependencies, including development dependencies
-RUN npm install
+RUN npm install --legacy-peer-deps
 
 # Copy the rest of the application code to the container
 COPY . .
@@ -25,7 +25,7 @@ COPY --from=build /app/package*.json ./
 COPY --from=build /app/dist ./dist
 
 # Install production dependencies only
-RUN npm install --production
+RUN npm install --legacy-peer-deps --omit=dev
 
 # Expose the port that your NestJS application will run on
 EXPOSE 5001
