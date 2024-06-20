@@ -19,9 +19,7 @@ import { MessageService } from '../../api/messages/service/messages.service';
 import { CreateDirectMessageDTO } from 'src/api/messages/dto/create-direct-message.dto';
 import { DirectMessagesService } from 'src/api/messages/service/direct-messages.service';
 
-const port = 5000;
-
-@WebSocketGateway(port, {
+@WebSocketGateway(parseInt(process.env.PORT, 10), {
   cors: {
     methods: ['GET', 'POST'],
     allowedHeaders: 'Content-Type, x-requested-with',
