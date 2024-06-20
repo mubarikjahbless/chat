@@ -1,4 +1,4 @@
-export enum ChatRoomType {
+export enum ChatChannelType {
   PRIVATE = 'private',
   PUBLIC = 'public',
 }

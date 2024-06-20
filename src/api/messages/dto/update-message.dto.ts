@@ -1,24 +1,7 @@
-import { IsNotEmpty, IsOptional, IsString } from 'class-validator';
-import { Types } from 'mongoose';
-import { Content } from '../../../common/types/message';
+import { PartialType } from '@nestjs/mapped-types';
+import { CreateMessageDTO } from './create-message.dto';
 
-export class UpdateMessageDTO {
-  @IsString()
-  @IsNotEmpty()
-  content: Content;
 
-  @IsOptional()
-  @IsString()
-  from: Types.ObjectId;
-
-  @IsOptional()
-  @IsString()
-  to: Types.ObjectId;
-
-  @IsOptional()
-  @IsString()
-  room?: Types.ObjectId;
-
-  @IsString()
-  status: string;
+export class UpdateMessageDTO extends PartialType(CreateMessageDTO) {
+ 
 }

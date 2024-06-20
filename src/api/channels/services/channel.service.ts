@@ -1,25 +1,25 @@
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
-import { RoomModel } from '../../../common/models';
+import { ChannelModel } from '../../../common/models';
 import { ApiResponseService } from '../../../common/utility/api-response.service';
 import { ObjectId } from 'mongodb';
-import { CreateRoomDTO } from '../dto/create-room.dto';
-import { UpdateRoomDTO } from '../dto/update-room.dto';
+import { CreateChannelDTO } from '../dto/create-channel.dto';
+import { UpdateChannelDTO } from '../dto/update-channel.dto';
 
 @Injectable()
-export class RoomService {
+export class ChannelService {
   constructor(
-    @InjectModel(RoomModel.name) private readonly model: Model<RoomModel>,
+    @InjectModel(ChannelModel.name) private readonly model: Model<ChannelModel>,
     private readonly apiResponseService: ApiResponseService,
   ) {}
 
-  public async getRooms() {
+  public async getChannels() {
     const result = await this.model.find();
-    return this.apiResponseService.successResponseWithData('all rooms', result);
+    return this.apiResponseService.successResponseWithData('all channels', result);
   }
 
-  public async searchRoom(searchKey: string) {
+  public async searchChannel(searchKey: string) {
     const result = searchKey
       ? await this.model.find({
           name: { $regex: new RegExp(`.*${searchKey}.*`) },
@@ -31,57 +31,57 @@ export class RoomService {
     );
   }
 
-  public async getRoomById(roomId: string) {
-    const result = await this.model.findById({ _id: new ObjectId(roomId) });
+  public async getChannelById(channelId: string) {
+    const result = await this.model.findById({ _id: new ObjectId(channelId) });
     return result
       ? this.apiResponseService.successResponseWithData('', result)
       : this.apiResponseService.notFoundResponse(
-          'The requested room does not exist',
+          'The requested channel does not exist',
         );
   }
 
-  public joinRoom(data: any, id: string) {
+  public joinChannel(data: any, id: string) {
     const result = this.model.findByIdAndUpdate(
       new ObjectId(id),
       { $push: { connectedUsers: data.user } },
       { returnOriginal: false },
     ).exec;
-    const successResponseMessage = `successfully join room ${result.name}`;
+    const successResponseMessage = `successfully join channel ${result.name}`;
     return result
       ? this.apiResponseService.successResponse(successResponseMessage)
-      : this.apiResponseService.notFoundResponse('The room does not exist');
+      : this.apiResponseService.notFoundResponse('The channel does not exist');
   }
 
-  public async createRoom(data: CreateRoomDTO) {
+  public async createChannel(data: CreateChannelDTO) {
     const result = await this.model.create(data);
-    const successResponseMessage = `Successfully created room ${result.name}`;
+    const successResponseMessage = `Successfully created channel ${result.name}`;
     return this.apiResponseService.successResponseWithData(
       successResponseMessage,
       result,
     );
   }
 
-  public async updateRoomInfo(room: UpdateRoomDTO, id: string) {
+  public async updateChannelInfo(channel: UpdateChannelDTO, id: string) {
     const result = await this.model.findByIdAndUpdate(
       new ObjectId(id),
-      { $set: { ...room } },
+      { $set: { ...channel } },
       { returnOriginal: false },
     );
     return result
       ? this.apiResponseService.successResponseWithData(
-          'successfully update room info',
+          'successfully update channel info',
           result,
         )
       : this.apiResponseService.errorResponse(
-          'An error occured while updating room',
-          'Sorry, we could not update room info at the momment',
+          'An error occured while updating channel',
+          'Sorry, we could not update channel info at the momment',
         );
   }
 
-  public async deleteRoom(id: string) {
+  public async deleteChannel(id: string) {
     const result = await this.model.findByIdAndDelete(id);
     return result
-      ? this.apiResponseService.successResponse('Successfully deleted room')
-      : this.apiResponseService.notFoundResponse('The room does not exist');
+      ? this.apiResponseService.successResponse('Successfully deleted channel')
+      : this.apiResponseService.notFoundResponse('The channel does not exist');
   }
 }

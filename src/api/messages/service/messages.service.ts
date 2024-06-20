@@ -1,6 +1,6 @@
 import { InjectModel } from '@nestjs/mongoose';
-import { Model } from 'mongoose';
-import { MessageModel } from '../../../common/models';
+import { Model, Types } from 'mongoose';
+import { MessageModel, UserModel } from '../../../common/models';
 import { ApiResponseService } from '../../../common/utility/api-response.service';
 import { CreateMessageDTO } from '../dto/create-message.dto';
 export class MessageService {
@@ -10,10 +10,14 @@ export class MessageService {
     private readonly apiResponseService: ApiResponseService,
   ) {}
 
-  public async getMessages(where: any) {
+  public async getMessages(channelId: string) {  
+    if(!channelId){
+      return this.apiResponseService.notFoundResponse('No messages found for the selected Id')
+    }  
     const result = await this.messageModel
-      .find(where)
-      .populate({ path: 'from', select: '_id name' });
+      .find({channelId:new Types.ObjectId(channelId)})
+      .populate({path:'sender', model: UserModel.name})
+      // .populate({ path: 'chatId', model: ChannelModel.name, select: '_id name' })    
     return this.apiResponseService.successResponseWithData(
       'successful',
       result,

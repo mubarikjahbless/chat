@@ -9,9 +9,9 @@ import {
   MaxLength,
   MinLength,
 } from 'class-validator';
-import { ChatRoomType } from '../../../common/enums/chat-room-type';
+import { ChatChannelType } from '../../../common/enums/chat-channel-type';
 
-export class CreateRoomDTO {
+export class CreateChannelDTO {
   @IsString()
   @IsNotEmpty()
   @MinLength(5, { message: 'name too short minimum should be 5 charactors' })
@@ -20,7 +20,7 @@ export class CreateRoomDTO {
 
   @IsString()
   @IsOptional()
-  type: string = ChatRoomType.PUBLIC;
+  type: string = ChatChannelType.PUBLIC;
 
   // TODO: remove these below properties as arrays
   @IsOptional()

@@ -2,32 +2,48 @@ import { MiddlewareConsumer, Module, NestModule } from '@nestjs/common';
 import { SocketService } from './services/socket.service';
 import { SocketGateway } from './gateway/socket.gateway';
 import { MessagesController } from '../api/messages/controllers/messages.controller';
-import { RoomsController } from '../api/rooms/controller/rooms.controller';
-import { AuthController } from 'src/api/auth/auth.controller';
+import { AuthController } from '../api/auth/auth.controller';
 import {
   MessageModel,
   MessageSchema,
-  RoomModel,
-  RoomSchema,
+  ChannelModel,
+  ChannelSchema,
   UserModel,
   UserSchema,
-} from 'src/common/models';
+  DirectMessageModel,
+  DirectMessageSchema,
+  ChannelMemberModel,
+  ChannelMemberSchema,
+} from '../common/models';
 import { MongooseModule } from '@nestjs/mongoose';
-import { environment } from 'src/environment';
 import { ClientsModule, Transport } from '@nestjs/microservices';
 import { SocketAuthMiddleware } from '../common/middleware';
-import { RoomService } from '../api/rooms/services/room.service';
-import { ApiResponseService } from 'src/common/utility/api-response.service';
+import { ApiResponseService } from '../common/utility/api-response.service';
 import { MessageService } from '../api/messages/service/messages.service';
 import { AuthService } from '../api/auth/auth.service';
+import { ConfigModule, ConfigService } from '@nestjs/config';
+import configuration from 'config/configuration';
+import { ChannelService } from '../api/channels/services/channel.service';
+import { ChannelsController } from '../api/channels/controller/channels.controller';
+import { DirectMessagesService } from '../api/messages/service/direct-messages.service';
+import { DirectMessagesController } from '../api/messages/controllers/direct-messages.controller';
 
 @Module({
   imports: [
-    MongooseModule.forRoot(environment.MONGO_DB_URL || process.env.DB_URL, {}),
+    ConfigModule.forRoot({isGlobal:false, load: [configuration]}),
+    MongooseModule.forRootAsync({
+      imports: [ConfigModule],
+      useFactory: (configService: ConfigService) => ({
+        uri: configService.get<string>('database.host'),
+      }),
+      inject: [ConfigService],
+    }),
     MongooseModule.forFeature([
       { name: MessageModel.name, schema: MessageSchema },
-      { name: RoomModel.name, schema: RoomSchema },
+      { name: ChannelModel.name, schema: ChannelSchema },
       { name: UserModel.name, schema: UserSchema },
+      { name: DirectMessageModel.name, schema: DirectMessageSchema },
+      { name: ChannelMemberModel.name, schema: ChannelMemberSchema },
     ]),
     ClientsModule.register([
       {
@@ -36,6 +52,7 @@ import { AuthService } from '../api/auth/auth.service';
         options: {
           host: 'localhost',
           port: 6379,
+
         },
       },
     ]),
@@ -43,12 +60,13 @@ import { AuthService } from '../api/auth/auth.service';
   providers: [
     SocketGateway,
     SocketService,
-    RoomService,
+    ChannelService,
     MessageService,
     ApiResponseService,
     AuthService,
+    DirectMessagesService,
   ],
-  controllers: [RoomsController, MessagesController, AuthController],
+  controllers: [ChannelsController, MessagesController, AuthController,DirectMessagesController],
 })
 export class SocketModule implements NestModule {
   configure(consumer: MiddlewareConsumer) {

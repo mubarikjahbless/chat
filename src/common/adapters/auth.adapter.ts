@@ -1,7 +1,7 @@
 import { IoAdapter } from '@nestjs/platform-socket.io';
 import { verify } from 'jsonwebtoken';
 import { Socket } from 'socket.io';
-import { User } from '../../common/types/message';
+import { User } from '../interfaces';
 
 export interface CustomSocket extends Socket {
   user: User;

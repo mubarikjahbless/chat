@@ -51,7 +51,7 @@ describe('MessageService', () => {
         populate: jest.fn().mockReturnValue(messages),
       });
 
-      await service.getMessages({});
+      await service.getMessages('667296a1d9a1f8297cf1796d');
 
       expect(mockMessageModel.find).toHaveBeenCalledWith({});
       expect(

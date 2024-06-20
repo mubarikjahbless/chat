@@ -1,6 +1,6 @@
 import { IsString, IsNotEmpty } from 'class-validator';
 import { Types } from 'mongoose';
-import { Content } from '../../../common/types/message';
+import { Content } from '../../../common/interfaces';
 
 export class CreateMessageDTO {
   @IsString()
@@ -9,7 +9,7 @@ export class CreateMessageDTO {
 
   @IsNotEmpty()
   @IsString()
-  from: Types.ObjectId;
+  sender: Types.ObjectId;
 
   @IsNotEmpty()
   @IsString()
@@ -17,7 +17,7 @@ export class CreateMessageDTO {
 
   @IsNotEmpty()
   @IsString()
-  room?: Types.ObjectId;
+  channelId?: Types.ObjectId;
 
   @IsString()
   status: string;

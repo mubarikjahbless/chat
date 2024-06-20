@@ -1,6 +1,6 @@
 import { ForbiddenException } from '@nestjs/common';
 import * as jwt from 'jsonwebtoken';
-import { User } from '../types/message';
+import { User } from '../interfaces';
 
 const getJwtSignature = (): jwt.SignOptions => {
   return {

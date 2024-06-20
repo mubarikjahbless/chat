@@ -7,15 +7,17 @@ import {
 } from '@nestjs/websockets';
 import { Server } from 'socket.io';
 import { InjectModel } from '@nestjs/mongoose';
-import { Model, Types, ObjectId, Schema } from 'mongoose';
+import { Model, Types } from 'mongoose';
 import { CustomSocket } from '../../common/adapters/auth.adapter';
-import { MessageModel, RoomModel, UserModel } from '../../common/models';
-import { ChatEvents } from 'src/common/enums/chat-events';
-import { Message } from '../../common/types/message';
-import { MessageService } from 'src/api/messages/service/messages.service';
-import { CreateMessageDTO } from 'src/api/messages/dto/create-message.dto';
-import { ChatRoomType } from 'src/common/enums/chat-room-type';
+import { MessageModel, ChannelModel, UserModel } from '../../common/models';
+import { ChatEvents } from '../../common/enums/chat-events';
+import { Message } from '../../common/interfaces/message';
+import { CreateMessageDTO } from '../../api/messages/dto/create-message.dto';
+import { ChatChannelType } from '../../common/enums/chat-channel-type';
 import { MessageStatus } from '../../common/enums/message-status';
+import { MessageService } from '../../api/messages/service/messages.service';
+import { CreateDirectMessageDTO } from 'src/api/messages/dto/create-direct-message.dto';
+import { DirectMessagesService } from 'src/api/messages/service/direct-messages.service';
 
 const port = 5000;
 
@@ -30,10 +32,11 @@ export class SocketGateway implements OnGatewayDisconnect, OnGatewayConnection {
   constructor(
     @InjectModel(MessageModel.name)
     private readonly messagesModel: Model<MessageModel>,
-    @InjectModel(RoomModel.name) private readonly roomsModel: Model<RoomModel>,
+    @InjectModel(ChannelModel.name) private readonly channelsModel: Model<ChannelModel>,
     @InjectModel(UserModel.name) private readonly usersModel: Model<UserModel>,
     private readonly messageService: MessageService,
-  ) {}
+    private readonly directMessageService: DirectMessagesService,
+  ) { }
 
   @WebSocketServer()
   server: Server;
@@ -52,45 +55,59 @@ export class SocketGateway implements OnGatewayDisconnect, OnGatewayConnection {
   }
 
   @SubscribeMessage(ChatEvents.ENTERCHATROOM)
-  async enterChatRoom(client: CustomSocket, roomId: string) {
-    client.join(roomId);
+  async enterChatChannel(client: CustomSocket, channel: { name: string, channelId: string }) {
+    client.join(channel.channelId);
+
     client.broadcast
-      .to(roomId)
+      .to(channel.channelId)
       .emit(ChatEvents.USERJOIN, { user: client.user.name, event: 'joined' });
   }
 
   @SubscribeMessage(ChatEvents.LEAVECHATROOM)
-  async leaveChatRoom(client: CustomSocket, roomId: string) {
+  async leaveChatChannel(client: CustomSocket, channelId: string) {
     client.broadcast
-      .to(roomId)
+      .to(channelId)
       .emit(ChatEvents.USERLEFT, { user: client.user.name, event: 'left' });
-    client.leave(roomId);
+    client.leave(channelId);
   }
 
-  @SubscribeMessage(ChatEvents.ADDMESSAGE)
+  @SubscribeMessage(ChatEvents.GROUPMESSAGE)
   async addMessage(client: CustomSocket, message: Message) {
-    message.from = client.user.id;
+    // message.from = new Types.ObjectId(client.user.id);
     message.timeSent = new Date();
-    await this.messagesModel.create(message);
-    this.server.in(message.room).emit(ChatEvents.MESSAGE, message);
-  }
-
-  @SubscribeMessage(ChatEvents.PRIVATECHAT)
-  async chatPrivately(client: CustomSocket, message: Message) {
-    message.from = client.user.id;
-    message.room = client.user.id;
     const messageTDO: CreateMessageDTO = {
-      content: { text: message.content.text, type: ChatRoomType.PRIVATE },
-      from: new Types.ObjectId(client.user.id),
+      content: { text: message.content.text, type: ChatChannelType.PRIVATE },
+      sender: new Types.ObjectId(client.user.id),
       to: new Types.ObjectId(message.to),
       status: MessageStatus.DELIVERED,
-      room: new Types.ObjectId(client.user.id),
+      channelId: new Types.ObjectId(message.chatId),
     };
-    await this.messageService.saveMessage(messageTDO);
 
+    const senderMessage = {
+      content: { text: message.content.text, type: ChatChannelType.PRIVATE },
+      sender: { name: client.user.name, _id: client.user.id },
+      status: MessageStatus.DELIVERED,
+      chatId: new Types.ObjectId(message.chatId),
+    }
+    await this.messageService.saveMessage(messageTDO);
+    this.server.in(message.chatId).emit(ChatEvents.MESSAGE, senderMessage);
+  }
+
+  @SubscribeMessage(ChatEvents.PRIVATEMESSAGE)
+  async chatPrivately(client: CustomSocket, message: Message) {
+    message.sender = client.user.id;
+    const messageTDO: CreateDirectMessageDTO = {
+      content: { text: message.content.text, type: ChatChannelType.PRIVATE },
+      sender: new Types.ObjectId(client.user.id),
+      receiver: new Types.ObjectId(message.to),
+      status: MessageStatus.DELIVERED,
+    };
+
+    await this.directMessageService.create(messageTDO);
     const receiver = await this.getReceiver(message.to);
     if (receiver) {
       client.to(receiver).emit(ChatEvents.MESSAGE, message);
+      client.emit(ChatEvents.MESSAGE, message)
     } else {
       // TODO: send push notification here
     }

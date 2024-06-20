@@ -1,7 +1,7 @@
 import { Body, Controller, Get, Post } from '@nestjs/common';
 import { CurrentUser, Public } from '../../common/decorators';
-import { User } from 'src/common/types/message';
 import { AuthService } from './auth.service';
+import { User } from '../../common/interfaces';
 
 @Controller('auth')
 export class AuthController {

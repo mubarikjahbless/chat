@@ -18,10 +18,9 @@ export class MessagesController {
 
   @Public()
   @Get()
-  find(@Query('where') where) {
-    where = JSON.parse(where || '{}');
-
-    return this.messageService.getMessages(where);
+  find(@Query('chatId') chatId: string) {
+    
+    return this.messageService.getMessages(chatId);
   }
 
   @Public()
@@ -36,11 +35,12 @@ export class MessagesController {
     return this.messageService.getallMessages();
   }
 
-  @Public()
-  @Put()
-  updateMessage(@Body() data: UpdateMessageDTO) {
-    return this.messageService.getMessages(data);
-  }
+  //TODO: uncomment when necessary
+  // @Public()
+  // @Put()
+  // updateMessage(@Body() data: UpdateMessageDTO) {
+  //   return this.messageService.saveMessage(data);
+  // }
 
   @Public()
   @Post()

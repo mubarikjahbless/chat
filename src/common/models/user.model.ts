@@ -1,8 +1,8 @@
 import { MessageModel } from './message.model';
-import { RoomModel } from './room.model';
 import { ObjectID } from 'bson';
 import { Types } from 'mongoose';
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
+import { ChannelModel } from '.';
 
 @Schema()
 export class UserModel {
@@ -22,11 +22,11 @@ export class UserModel {
   @Prop()
   loggedIn: boolean;
 
-  @Prop({ type: [{ type: Types.ObjectId, ref: 'Message' }] })
+  @Prop({ type: [{ type: Types.ObjectId, ref: 'message' }] })
   messages?: MessageModel[];
 
-  @Prop({ type: [{ type: Types.ObjectId, ref: 'Room' }] })
-  joinedRooms?: RoomModel[];
+  @Prop({ type: [{ type: Types.ObjectId, ref: 'channel' }] })
+  joinedChannels?: ChannelModel[];
 }
 
 export const UserSchema = SchemaFactory.createForClass(UserModel);

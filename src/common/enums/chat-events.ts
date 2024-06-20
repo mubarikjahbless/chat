@@ -1,11 +1,11 @@
 export enum ChatEvents {
   MESSAGE = 'message',
   PRIVATECHAT = 'private-chat',
-  LEAVECHATROOM = 'leave-chat-room',
+  LEAVECHATROOM = 'leave-chat-channel',
   USERCONNECTED = 'user-connected',
-  ENTERCHATROOM = 'enter-chat-room',
+  ENTERCHATROOM = 'enter-chat-channel',
   PRIVATEMESSAGE = 'private-message',
   USERLEFT = 'user-left',
   USERJOIN = 'user-join',
-  ADDMESSAGE = 'add-message',
+  GROUPMESSAGE = 'group-message',
 }
