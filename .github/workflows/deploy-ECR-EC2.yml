@@ -1,0 +1,92 @@
+name: Push to ECR and Deploy to EC2
+
+on:
+  push:
+    branches: [stage]
+
+jobs:
+  build-and-deploy:
+    name: Build image and deploy to EC2
+    runs-on: ubuntu-latest
+    env:
+      SSH_KEY_PATH: ./ssh-key.pem
+      EC2_USER: ${{ secrets.EC2_USER }}
+      EC2_HOST: ${{ secrets.EC2_HOST }}
+
+    steps:
+      - name: Check Out Repo
+        uses: actions/checkout@v2
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: eu-west-1
+
+      - name: Login to Amazon ECR
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v1
+
+      - name: Build, tag, and push image to Amazon ECR
+        env:
+          ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+          ECR_REPOSITORY: awtsyde-user-v2
+          IMAGE_TAG: latest
+        run: |
+          docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG .
+          docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
+
+      - name: Deploy to EC2
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          ECR_REPOSITORY: awtsyde-user-v2
+          IMAGE_TAG: latest
+
+          ECR_REPO: ${{ steps.login-ecr.outputs.registry }}
+
+        run: |
+          # Save the SSH private key to a file
+          echo "${{ secrets.SSH_PRIVATE_KEY }}" > $SSH_KEY_PATH
+
+          # Secure the private key file permissions
+          chmod 600 $SSH_KEY_PATH
+
+          # Concatenate the ECR repository URL and the image tag
+          ECR_REPO_URL="$ECR_REPO/${ECR_REPOSITORY}:${IMAGE_TAG}"
+
+          # Replace with your deployment script or commands
+          ssh -i $SSH_KEY_PATH -o StrictHostKeyChecking=no $EC2_USER@$EC2_HOST << EOF
+
+            # Authenticate
+            aws ecr get-login-password | docker login --username AWS --password-stdin "$ECR_REPO_URL"
+
+            # Attempt to pull the image
+            docker pull "$ECR_REPO_URL"
+
+            cd /home/ubuntu/projects/awtsyde-user-v2
+            docker stop awtsyde-user-v2 || true
+            docker rm awtsyde-user-v2 || true
+            cd /home/ubuntu/projects/awtsyde-user-v2
+            docker run -d -p 5001:5001 --env-file=./.env --name awtsyde-user-v2 $ECR_REPO_URL
+          EOF
+          
+  slack-workflow-status:
+    if: always()
+    name: Post Workflow Status To Slack
+    needs:
+        - build-and-deploy
+    runs-on: ubuntu-latest
+    steps:
+      - name: Slack Workflow Notification
+        uses: Gamesight/slack-workflow-status@master
+        with:
+          # Required Input
+          repo_token: ${{secrets.TOKEN}}
+          slack_webhook_url: ${{secrets.SLACK_WEBHOOK_URL}}
+          # Optional Input
+          channel: '#awtsyde-notifications-cicd' 
+          name: 'User Notification'
+          icon_emoji: '👌'
+          icon_url: 'https://avatars0.githubusercontent.com/u/1701160?s=96&v=2'
